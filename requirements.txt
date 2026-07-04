@@ -1,0 +1,9 @@
+pandas
+numpy
+requests
+wbgapi
+python-dotenv
+google-cloud-bigquery
+google-auth
+db-dtypes
+apache-airflow

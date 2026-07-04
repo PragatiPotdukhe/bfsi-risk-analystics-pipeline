@@ -1,0 +1,8 @@
+.env
+gcp_key.json
+data/raw/
+__pycache__/
+*.pyc
+*.csv
+*.xlsx
+venv/
