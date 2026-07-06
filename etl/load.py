@@ -8,15 +8,16 @@ log = get_logger("load")
 
 def get_bq_client():
     """Returns an authenticated BigQuery client using the service account key."""
-    key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "gcp_key.json")
+    # key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "gcp_key.json")
     project = os.getenv("GCP_PROJECT_ID")
-    creds = service_account.Credentials.from_service_account_file(
-        key_path,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"],
-    )
-    return bigquery.Client(credentials=creds, project=project)
+    # creds = service_account.Credentials.from_service_account_file(
+    #     key_path,
+    #     scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    # )
+    # return bigquery.Client(credentials=creds, project=project)
+    return bigquery.Client(project = project)
 
-
+ 
 def load_table(df, table_name, client, write_mode="WRITE_TRUNCATE"):
     """
     Loads a DataFrame into a BigQuery table.

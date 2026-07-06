@@ -1,8 +1,9 @@
 import os
 import logging
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()  # loads .env file into environment variables
+load_dotenv(dotenv_path = Path(__file__).resolve().parent.parent / ".env")  # loads .env file into environment variables
 
 
 def get_logger(name):
