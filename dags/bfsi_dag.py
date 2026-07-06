@@ -11,14 +11,14 @@ writing and understanding even if you end up running the pipeline via
 Windows Task Scheduler instead - just be upfront in interviews about which
 one you actually ran.
 """
-import os
+import os, sys
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "etl"))
+sys.path.insert(0,'/opt/airflow/project/etl')
+# sys.path.append(os.path.join(os.path.dirname(__file__), "..", "etl"))
 
 from extract import extract_rbi, extract_loans, extract_macro       # noqa: E402
 from transform import clean_rbi, clean_loans, clean_macro, join_all  # noqa: E402
@@ -56,7 +56,7 @@ def _load_to_bigquery():
 
 with DAG(
     dag_id="bfsi_risk_pipeline",
-    schedule_interval="0 6 * * *",   # runs every day at 6:00 AM
+    schedule="0 6 * * *",   # runs every day at 6:00 AM
     start_date=datetime(2025, 1, 1),
     catchup=False,
     default_args={"retries": 2, "retry_delay": timedelta(minutes=5)},

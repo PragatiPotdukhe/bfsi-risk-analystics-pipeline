@@ -7,7 +7,7 @@ from utils import get_logger
 
 log = get_logger("extract")
 
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # -- Source 1: RBI DBIE ------------------------------------------------------
 def extract_rbi():
     """Pull quarterly bank-wise NPA data from the RBI DBIE API."""
@@ -34,7 +34,7 @@ def extract_rbi():
     # df = pd.DataFrame(payload["data"])
     # log.info(f"RBI: {df.shape[0]} rows, {df.shape[1]} cols")
     # return df
-    df = pd.read_csv("../data/raw/sample_rbi_npa_data.csv")
+    df = pd.read_csv(os.path.join(BASE_DIR, "data", "raw", "sample_rbi_npa_data.csv"))
     log.info(f"RBI (SAMPLE DATA): {df.shape[0]} rows, {df.shape[1]} cols")
     return df 
 
@@ -73,7 +73,7 @@ def extract_loans():
     # df = pd.DataFrame(all_records)
     # log.info(f"data.gov.in: {df.shape[0]} rows, {df.shape[1]} cols")
     # return df
-    df = pd.read_csv("../data/raw/sample_msme_loans_data.csv")
+    df = pd.read_csv(os.path.join(BASE_DIR, "data", "raw", "sample_msme_loans_data.csv"))
     log.info(f"MSME loans (SAMPLE DATA): {df.shape[0]} rows, {df.shape[1]} cols")
     return df
 
