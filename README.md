@@ -55,14 +55,7 @@ See `Pragati_DE_Project_Build_Checklist.md` for the full phase-by-phase build pl
 
 ## Dashboard
 
-### Risk Overview
-![Risk Overview](Power Bi/Dashboard_risk_overview.png)
-
-### Delinquency Deep Dive
-![Delinquency](Power Bi/Dashboard_delequency.png)
-
-### Macro vs Credit Risk
-![Macro](Power Bi/dashboard_macro.png)
-
-### Portfolio Segmentation
-![Segmentation](Power Bi/dashboard_segmentation.png)
+![Risk Overview](dashboard_screenshots/dashboard_risk_overview.png)
+![Delinquency](dashboard_screenshots/dashboard_delinquency.png)
+![Macro](dashboard_screenshots/dashboard_macro.png)
+![Segmentation](dashboard_screenshots/dashboard_segmentation.png)
