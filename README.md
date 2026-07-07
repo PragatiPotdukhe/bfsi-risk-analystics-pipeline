@@ -52,3 +52,17 @@ The original walkthrough's `join_all()` referenced a `bank_type_mapped` column o
 ## Next steps
 
 See `Pragati_DE_Project_Build_Checklist.md` for the full phase-by-phase build plan, and `Pragati_Interview_Prep_Project_QA.md` for how to talk about this in interviews.
+
+## Dashboard
+
+### Risk Overview
+![Risk Overview](Power Bi/Dashboard_risk_overview.png)
+
+### Delinquency Deep Dive
+![Delinquency](Power Bi/Dashboard_delequency.png)
+
+### Macro vs Credit Risk
+![Macro](Power Bi/dashboard_macro.png)
+
+### Portfolio Segmentation
+![Segmentation](Power Bi/dashboard_segmentation.png)
