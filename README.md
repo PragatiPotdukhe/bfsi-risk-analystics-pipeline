@@ -59,3 +59,119 @@ See `Pragati_DE_Project_Build_Checklist.md` for the full phase-by-phase build pl
 ![Delinquency](dashboard_screenshots/dashboard_delinquency.png)
 ![Macro](dashboard_screenshots/dashboard_macro.png)
 ![Segmentation](dashboard_screenshots/dashboard_segmentation.png)
+
+
+# BFSI Risk Analytics Pipeline
+
+An end-to-end data engineering portfolio project — ingesting public
+BFSI data, modeling a star schema in BigQuery, orchestrating with
+Airflow, and surfacing insights in Power BI.
+
+## Architecture
+
+[paste your architecture diagram here — see below]
+
+## Tech Stack
+
+| Layer | Tool |
+|---|---|
+| Ingestion | Python, REST APIs (RBI DBIE, data.gov.in, World Bank) |
+| Transformation | Python, Pandas |
+| Storage | Google BigQuery (star schema) |
+| Orchestration | Apache Airflow / Windows Task Scheduler |
+| Visualisation | Power BI |
+| Version Control | Git, GitHub |
+
+## Data Sources
+
+| Source | Data | Records |
+|---|---|---|
+| RBI DBIE | Bank-wise NPA data (quarterly) | ~2,400 rows |
+| data.gov.in | MSME loan disbursement by district | ~44,800 rows |
+| World Bank (wbgapi) | GDP, inflation, unemployment, interest rate | 10 rows |
+
+## Data Model
+
+Star schema with 1 fact table and 2 dimension tables:
+- `fact_loan_risk` — district-level MSME loan records with derived risk fields
+- `dim_npa_summary` — RBI quarterly NPA benchmarks by bank group
+- `dim_macro` — World Bank macro indicators by year
+
+Fact table joins to both dimensions on `year_int`.
+
+## Dashboard
+
+### Risk Overview
+![Risk Overview](dashboard_screenshots/dashboard_risk_overview.png)
+
+### Delinquency Deep Dive
+![Delinquency](dashboard_screenshots/dashboard_delinquency.png)
+
+### Macro vs Credit Risk
+![Macro](dashboard_screenshots/dashboard_macro.png)
+
+### Portfolio Segmentation
+![Segmentation](dashboard_screenshots/dashboard_segmentation.png)
+
+## Setup Instructions
+
+### Prerequisites
+- Python 3.10+
+- Google Cloud account (free tier)
+- Power BI Desktop (free)
+
+### Steps
+
+1. Clone the repo
+git clone https://github.com/PragatiPotdukhe/bfsi-risk-analytics-pipeline.git
+
+2. Create virtual environment and install dependencies
+python -m venv venv
+ venv\Scripts\activate
+ pip install -r requirements.txt
+
+ 3. Copy `.env.example` to `.env` and fill in your credentials
+ RBI_API_KEY=your_key
+ DATAGOV_API_KEY=your_key
+ GCP_PROJECT_ID=your_project_id
+ GCP_DATASET=bfsi_warehouse
+ GOOGLE_APPLICATION_CREDENTIALS=gcp_key.json
+
+ 4. Run the pipeline
+ python etl/main.py
+
+ 5. Open Power BI Desktop → Get Data → Google BigQuery →
+   select `bfsi_warehouse`
+
+## Key Design Decisions
+
+- **Star schema over flat table** — avoids duplicating RBI and macro
+  data across 44,800 loan rows; each dimension is independently
+  updateable
+- **BigQuery over local DB** — serverless, free at this scale, native
+  Power BI connector, same class of tool as Redshift/Synapse
+- **Import mode in Power BI** — data refreshes once daily via pipeline;
+  live DirectQuery adds latency with no freshness benefit
+- **Parquet for inter-task handoff** — XCom is for metadata, not
+  DataFrames; Parquet is the production-realistic pattern
+
+## Known Limitations
+
+- Transform uses Pandas — would move to PySpark or BigQuery SQL for
+  100x data volume
+- Full refresh (WRITE_TRUNCATE) on every run — incremental loads would
+  be the production upgrade
+- No automated data quality checks yet — manual validation via BigQuery
+  queries currently
+
+## Author
+Pragati Potdukhe
+[https://www.linkedin.com/in/pragati-potdukhe/] | [https://github.com/PragatiPotdukhe]
+
+Architecture Diagram
+RBI DBIE API ──┐
+               ├──► extract.py ──► transform.py ──► load.py ──► BigQuery ──► Power BI
+data.gov.in ───┤         │               │
+               │    (Parquet)       (star schema)
+World Bank ────┘
+                    └────────── Airflow DAG (daily 6AM) ──────────┘
