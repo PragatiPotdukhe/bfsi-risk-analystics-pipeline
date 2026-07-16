@@ -1,0 +1,30 @@
+name: 'bfsi_risk_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'bfsi_risk_analytics'
+
+model-paths: ["models"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  bfsi_risk_analytics:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+
+snapshots:
+  bfsi_risk_analytics:
+    +target_schema: snapshots

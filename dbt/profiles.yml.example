@@ -1,0 +1,20 @@
+# Copy this to ~/.dbt/profiles.yml (do NOT commit a real profiles.yml - it
+# can contain paths to local credential files).
+#
+# method: oauth uses Application Default Credentials - the same
+# GOOGLE_APPLICATION_CREDENTIALS-driven auth the Python ETL and Airflow DAG
+# already use (see etl/load.py and README "GCP auth"). No service account
+# key needed or expected.
+
+bfsi_risk_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: pragati-risk-analytics
+      dataset: bfsi_warehouse
+      location: US
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive

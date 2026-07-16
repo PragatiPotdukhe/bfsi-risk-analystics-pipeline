@@ -1,0 +1,19 @@
+.env
+gcp_key.json
+__pycache__/
+*.pyc
+*.xlsx
+venv/
+
+# data/raw/*.csv IS committed on purpose - it's the clearly-labelled
+# synthetic sample data (see data/raw/SAMPLE_DATA_README.md) that lets
+# anyone clone this repo and run the pipeline end-to-end without needing
+# live RBI/data.gov.in API access. Only ignore scratch/output CSVs elsewhere.
+/*.csv
+/**/tmp/*.csv
+
+# dbt
+dbt/profiles.yml
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/

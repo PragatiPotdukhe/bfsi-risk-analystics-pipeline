@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: dim_district_current_risk
+    description: >
+      One row per district, using each district's latest fiscal year.
+      Snapshotted daily (see snapshots/district_risk_tier_snapshot.sql) so
+      tier reclassifications are preserved even though this model itself
+      always reflects the current run.
+    columns:
+      - name: state
+        tests: [not_null]
+      - name: district
+        tests: [not_null]
+      - name: current_year
+        tests: [not_null]
+      - name: npa_rate
+        tests: [not_null]
+      - name: risk_tier
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "Green (Low Risk)"
+                  - "Amber (Watch)"
+                  - "Red (High Risk)"
+                  - "Critical (>10%)"
+                  - "Unknown"
+      - name: tier_movement
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["New", "Unchanged", "Changed"]
+
+  - name: mart_state_risk_rollup
+    description: State-level executive rollup - district counts per risk tier, avg NPA rate, % beating industry benchmark.
+    columns:
+      - name: state
+        tests: [not_null, unique]
+      - name: district_count
+        tests: [not_null]
+
+  - name: mart_risk_tier_trend
+    description: Year-over-year district counts per risk tier across the full 10-year window, for the Power BI trend page.
+    columns:
+      - name: year_int
+        tests: [not_null]
+      - name: risk_tier
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "Green (Low Risk)"
+                  - "Amber (Watch)"
+                  - "Red (High Risk)"
+                  - "Critical (>10%)"
+                  - "Unknown"

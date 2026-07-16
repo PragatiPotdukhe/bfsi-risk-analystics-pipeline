@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: bfsi_warehouse
+    description: >
+      Raw tables loaded by the Python ETL (etl/main.py) via
+      client.load_table_from_dataframe with autodetect=True. dbt does not
+      extract or load into these tables - it only reads and transforms them.
+    schema: bfsi_warehouse
+    tables:
+      - name: fact_loan_risk
+        description: >
+          One row per district / fiscal year / loan category. Joined from
+          the MSME loan source, RBI industry NPA benchmark, and World Bank
+          macro indicators in etl/transform.py::join_all.
+        columns:
+          - name: state
+            description: Indian state name (real reference data).
+          - name: district
+            description: Indian district name (real reference data).
+          - name: year_int
+            description: Fiscal year start, parsed from the "YYYY-YY" string (e.g. 2019-20 -> 2019).
+          - name: risk_tier
+            description: "4-tier EWS classification bucketed on npa_rate: Green / Amber / Red / Critical."
+          - name: npa_rate
+            description: npa_count / loans_disbursed, clipped to [0, 1].
+          - name: vs_industry
+            description: npa_rate minus that year's industry-average NPA% (from RBI dim_npa_summary) - negative means beating the benchmark.
+      - name: dim_npa_summary
+        description: Quarterly RBI NPA benchmark by bank group/category.
+      - name: dim_macro
+        description: Annual India macro indicators (World Bank).

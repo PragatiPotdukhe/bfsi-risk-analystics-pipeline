@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_loan_risk
+    description: One row per district / fiscal year / loan category, renamed/typed from the raw fact table.
+    columns:
+      - name: state
+        tests: [not_null]
+      - name: district
+        tests: [not_null]
+      - name: year_int
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_macro')
+                field: year
+      - name: risk_tier
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "Green (Low Risk)"
+                  - "Amber (Watch)"
+                  - "Red (High Risk)"
+                  - "Critical (>10%)"
+                  - "Unknown"
+      - name: npa_rate
+        tests: [not_null]
+
+  - name: stg_npa_summary
+    description: Quarterly RBI NPA benchmark by bank group, cleaned and category-bucketed.
+    columns:
+      - name: bank_group
+        tests: [not_null]
+      - name: quarter_date
+        tests: [not_null]
+      - name: bank_category
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["Public", "Private", "Foreign/Other"]
+
+  - name: stg_macro
+    description: Annual India macro indicators from the World Bank.
+    columns:
+      - name: year
+        tests: [not_null, unique]

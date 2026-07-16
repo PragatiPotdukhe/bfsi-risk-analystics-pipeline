@@ -1,0 +1,57 @@
+name: dbt CI (static checks)
+
+# No BigQuery credentials in CI on purpose. The GCP org this project sits
+# under blocks service-account-key creation (iam.disableServiceAccountKeyCreation
+# - same blocker documented in Pragati_Challenge_QA.md), and a personal
+# gcloud ADC login isn't something to hand to GitHub Actions. So this
+# pipeline checks what it can without a warehouse connection: SQL lint and
+# a full dbt parse (resolves every ref()/source(), catches typos and broken
+# lineage) against a dummy profile. It does NOT run models or tests against
+# real BigQuery - that still happens locally / via the Airflow DAG.
+
+on:
+  push:
+    paths:
+      - "dbt/**"
+      - ".github/workflows/dbt_ci.yml"
+  pull_request:
+    paths:
+      - "dbt/**"
+      - ".github/workflows/dbt_ci.yml"
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt + lint tooling
+        run: pip install dbt-core==1.8.* dbt-bigquery==1.8.* sqlfluff==3.*
+
+      - name: SQL lint (sqlfluff, bigquery dialect)
+        run: sqlfluff lint dbt/models dbt/tests dbt/snapshots --dialect bigquery
+        continue-on-error: true   # style issues shouldn't hard-fail the build; ref/source errors below will
+
+      - name: Write dummy profile (no real credentials - parse-only)
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          bfsi_risk_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: bigquery
+                method: oauth
+                project: ci-placeholder-project
+                dataset: bfsi_warehouse
+                location: US
+                threads: 1
+          EOF
+
+      - name: dbt parse (validates every ref/source and Jinja/SQL syntax)
+        working-directory: dbt
+        run: dbt parse
